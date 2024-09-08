@@ -1,10 +1,5 @@
-import { Text, View } from "react-native";
+import Onboarding from "@/components/onboarding/Onboarding";
 
 export default function Index() {
-  return (
-    <View
-    >
-      <Text>Hello</Text>
-    </View>
-  );
+  return <Onboarding />;
 }
