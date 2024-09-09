@@ -33,7 +33,7 @@ const { user } = useUser();
 ```
 
 ```javascript
-- SVGR: https://react-svgr.com/playground/?native=true
-- Sử dụng web này để convert svg sang Svg của react-native-svg
-- Cách lưu xem mẫu các file Icon ở: assets/icons
+- [https://react-svgr.com/playground/?native=true](https://react-svgr.com/playground/?native=true): 
+- Sử dụng web này để convert svg sang Svg của react-native-svg.
+- Cách lưu xem mẫu các file Icon ở: [assets/icons](./assets/icons)
 ```
