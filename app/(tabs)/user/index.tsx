@@ -1,10 +1,10 @@
-import SignUp from "@/components/auth/SignUp";
+import UserScreen from "@/components/user/UserScreen";
 import { StatusBar } from "expo-status-bar";
 
-export default function RegisterScreen() {
+export default function UserTab() {
   return (
     <>
-      <SignUp />
+      <UserScreen />
       <StatusBar style="auto" />
     </>
   );

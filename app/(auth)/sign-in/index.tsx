@@ -1,9 +1,9 @@
-import Login from "@/components/auth/Login";
+import SignIn from "@/components/auth/SignIn";
 import { StatusBar } from "expo-status-bar";
 export default function LoginScreen() {
   return (
     <>
-      <Login />
+      <SignIn />
       <StatusBar style="auto" />
     </>
   );

@@ -1,9 +1,9 @@
 import { EmailIcon } from "@/assets/icons/EmailIcon";
 import { UserIcon } from "@/assets/icons/UserIcon";
-import Input from "@/components/Input";
+import Input from "@/components/ui/Input";
 import CustomCheckbox from "@/components/ui/MyCheckbox";
 import { Link } from "expo-router";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,9 +14,25 @@ import {
 } from "react-native";
 import PhoneInput from "react-native-international-phone-number";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as WebBrowser from "expo-web-browser";
 import SocialList from "./SocialList";
+import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
+import { useOAuth } from "@clerk/clerk-expo";
+import { OAuthStrategy } from "@/constants/enums";
+import * as Linking from "expo-linking";
 
-export default function Register() {
+WebBrowser.maybeCompleteAuthSession();
+
+export default function SignUp() {
+  useWarmUpBrowser();
+
+  const { startOAuthFlow: startOAuthGoogleFlow } = useOAuth({
+    strategy: "oauth_google",
+  });
+  const { startOAuthFlow: startOAuthFacebookFlow } = useOAuth({
+    strategy: "oauth_facebook",
+  });
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -26,6 +42,26 @@ export default function Register() {
     email: "",
     fullName: "",
   });
+
+  const onPress = useCallback(async (strategy: OAuthStrategy) => {
+    const selectedAuth = {
+      oauth_google: startOAuthGoogleFlow,
+      oauth_facebook: startOAuthFacebookFlow,
+    }[strategy];
+    try {
+      const { createdSessionId, setActive } = await selectedAuth({
+        redirectUrl: Linking.createURL("/home"),
+      });
+
+      if (createdSessionId) {
+        setActive!({ session: createdSessionId });
+      } else {
+        console.log("NO SESSION ID");
+      }
+    } catch (err) {
+      console.error("OAuth error", err);
+    }
+  }, []);
 
   function handleInputValue(phoneNumber: any) {
     setPhoneNumber(phoneNumber);
@@ -124,15 +160,15 @@ export default function Register() {
               <View className="flex-1 h-[1px] bg-[#6d6c69]"></View>
             </View>
 
-            <SocialList />
+            <SocialList onPress={onPress} />
             <View className="mt-6 items-center">
               <Text className="font-[Roboto-Regular] text-neutral-900">
-                Don't have an account?{" "}
+                Already have account?{" "}
                 <Link
-                  href="/"
+                  href="/(auth)/sign-in"
                   className="font-[Roboto-Medium] text-primary-500"
                 >
-                  Register
+                  Sign in
                 </Link>
               </Text>
             </View>

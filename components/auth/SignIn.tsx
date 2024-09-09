@@ -14,12 +14,12 @@ import PhoneInput from "react-native-international-phone-number";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SocialList from "./SocialList";
 import { useOAuth } from "@clerk/clerk-expo";
-import { OAuthStrategy } from "@/constants/types";
 import * as Linking from "expo-linking";
+import { OAuthStrategy } from "@/constants/enums";
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function LoginScreen() {
+export default function SignIn() {
   useWarmUpBrowser();
 
   const { startOAuthFlow: startOAuthGoogleFlow } = useOAuth({

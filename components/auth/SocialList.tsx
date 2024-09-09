@@ -1,6 +1,6 @@
 import { GoogleIcon } from "@/assets/icons/GoogleIcon";
 import { MetaIcon } from "@/assets/icons/MetaIcon";
-import { OAuthStrategy } from "@/constants/types";
+import { OAuthStrategy } from "@/constants/enums";
 import { TouchableOpacity, View } from "react-native";
 
 interface IProps {
