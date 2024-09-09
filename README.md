@@ -31,3 +31,9 @@ const { user } = useUser();
 - Các thông tin cơ bản của user như fullname, email, id, avatar sẽ lấy từ biến này.
 - Số điện thoại, địa chỉ,... của user sẽ viết Back-end lấy sau.
 ```
+
+```javascript
+- SVGR: https://react-svgr.com/playground/?native=true
+- Sử dụng web này để convert svg sang Svg của react-native-svg
+- Cách lưu xem mẫu các file Icon ở: assets/icons
+```
