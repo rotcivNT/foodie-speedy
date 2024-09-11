@@ -31,3 +31,27 @@ const { user } = useUser();
 - Các thông tin cơ bản của user như fullname, email, id, avatar sẽ lấy từ biến này.
 - Số điện thoại, địa chỉ,... của user sẽ viết Back-end lấy sau.
 ```
+
+- [SVGR](https://react-svgr.com/playground/?native=true): Sử dụng web này để convert svg sang Svg của react-native-svg.
+- Cách lưu xem mẫu các file Icon ở: [assets/icons](./assets/icons)
+
+# Project Name
+
+## Cài đặt và khởi động dự án
+
+1. **Cài đặt các gói phụ thuộc**:
+   - Mở terminal và chạy lệnh sau để cài đặt tất cả các gói phụ thuộc cần thiết:
+     ```bash
+     npm install
+     ```
+
+2. **Tạo file `.env`**:
+   - Tạo một file `.env` trong thư mục gốc của dự án.
+   - Thêm các biến môi trường cần thiết vào file `.env`.
+     ```
+
+3. **Khởi động dự án**:
+   - Sau khi cài đặt các gói phụ thuộc và tạo file `.env`, chạy lệnh sau để khởi động dự án:
+     ```bash
+     npm start
+     ```
