@@ -2,15 +2,12 @@ import ArrowLeftIcon from "@/assets/icons/ArrowLeftIcon";
 import { router } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 
-interface ProductListHeaderProps {
+interface ScreenHeaderProps {
   title: string;
   leftIcon?: React.ReactNode;
 }
 
-export const ProductListHeader = ({
-  title,
-  leftIcon,
-}: ProductListHeaderProps) => {
+export const ScreenHeader = ({ title, leftIcon }: ScreenHeaderProps) => {
   const onBack = () => {
     router.back();
   };

@@ -6,6 +6,8 @@ import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import "../global.css";
 import { tokenCache } from "@/helpers/tokenCache";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -36,22 +38,29 @@ export default function RootLayout() {
     >
       <ClerkLoaded>
         <QueryClientProvider client={queryClient}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="special-offer/index"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen name="products/category/[cateId]/index" />
-            <Stack.Screen name="products/[id]/index" />
-          </Stack>
+          <GestureHandlerRootView>
+            <BottomSheetModalProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: "white" },
+                }}
+              >
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="special-offer/index"
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen name="products/category/[cateId]/index" />
+                <Stack.Screen name="products/[id]/index" />
+                <Stack.Screen name="(modal)/location-search" />
+                <Stack.Screen name="basket/index" />
+              </Stack>
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </QueryClientProvider>
       </ClerkLoaded>
     </ClerkProvider>

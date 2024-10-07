@@ -1,15 +1,14 @@
-import { Product } from "@/constants/product.type";
 import { getProductsByCategoryId } from "@/libs/appwrite/appwrite";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ProductListHeader } from "../ui/product-list/ProductListHeader";
-import ProductList from "../ui/ProductList";
-import SearchBar from "../home/SearchBar";
 import { categories } from "../home/Categories";
+import SearchBar from "../home/SearchBar";
 import ProductListSkeleton from "../ui/loading/ProductListSkeleton";
-import { useQuery } from "@tanstack/react-query";
+import ProductList from "../ui/ProductList";
+import { ScreenHeader } from "../ui/ScreenHeader";
 
 const CategoryProduct = () => {
   const { cateId } = useLocalSearchParams();
@@ -25,10 +24,7 @@ const CategoryProduct = () => {
 
   return (
     <SafeAreaView className="px-3 mt-12 flex-1">
-      <ProductListHeader
-        title={category?.name || ""}
-        leftIcon={category?.icon}
-      />
+      <ScreenHeader title={category?.name || ""} leftIcon={category?.icon} />
       <View className="my-4">
         <SearchBar />
       </View>

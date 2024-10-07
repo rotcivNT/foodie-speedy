@@ -1,4 +1,5 @@
 import { Product, Topping } from "@/constants/product.type";
+import { ShoppingSession } from "@/constants/shopping.type";
 import { Models } from "react-native-appwrite";
 
 export const serializeDocumentsToProducts = (
@@ -29,4 +30,16 @@ export const serializeDocumentsToProducts = (
     };
   });
   return products || [];
+};
+
+export const serializeDocumentToShoppingSession = (
+  documents: Models.Document[]
+) => {
+  const shoppingSessions: ShoppingSession[] = documents.map((item) => ({
+    id: item.$id,
+    cartItems: item.cartItems,
+    total: item.total,
+    user_email: item.user_email,
+  }));
+  return shoppingSessions || [];
 };

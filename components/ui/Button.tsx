@@ -7,12 +7,15 @@ const buttonVariants = cva("flex items-center justify-center rounded-md", {
   variants: {
     variant: {
       default:
-        "bg-primary-500 rounded-[28px] flex flex-row items-center justify-center space-x-3",
+        "bg-primary-500 rounded-[28px] flex flex-row items-center justify-center",
       link: "bg-transparent",
+      outline:
+        "bg-transparent border border-primary-500 rounded-[100px] px-2 py-1",
     },
     size: {
       default: "",
-      lg: "h-[50px] px-4",
+      md: "h-[40px] px-3 space-x-2",
+      lg: "h-[50px] px-4 space-x-3",
     },
   },
   defaultVariants: {
@@ -26,6 +29,8 @@ const textVariants = cva("text-sm font-medium", {
     variant: {
       default: "text-white font-bold font-[Roboto] text-[18px]",
       link: "text-neutral-300 font-[Roboto-Medium] text-base leading-[19px] text-right underline",
+      rounded: "text-white font-bold font-[Roboto] text-[18px]",
+      outline: "text-primary-500 font-[Roboto-Medium] text-[12px]",
     },
   },
   defaultVariants: {
@@ -38,10 +43,14 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   title: string;
   leftIcon?: React.ReactNode;
+  textStyles?: string;
 }
 
 const Button = React.forwardRef<TouchableOpacity, ButtonProps>(
-  ({ className, title, variant, size, leftIcon, ...props }, ref) => {
+  (
+    { className, title, variant, size, leftIcon, textStyles, ...props },
+    ref
+  ) => {
     return (
       <TouchableOpacity
         className={twMerge(buttonVariants({ variant, size, className }))}
@@ -49,7 +58,9 @@ const Button = React.forwardRef<TouchableOpacity, ButtonProps>(
         {...props}
       >
         {leftIcon}
-        <Text className={twMerge(textVariants({ variant }))}>{title}</Text>
+        <Text className={twMerge(textVariants({ variant }), textStyles)}>
+          {title}
+        </Text>
       </TouchableOpacity>
     );
   }

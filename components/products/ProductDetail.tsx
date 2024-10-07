@@ -5,27 +5,33 @@ import MinusIcon from "@/assets/icons/MinusIcon";
 import PlusIcon from "@/assets/icons/PlusIcon";
 import RateStarIcon from "@/assets/icons/RateStarIcon";
 import ShoppingBagFillIcon from "@/assets/icons/ShoppingBagFillIcon";
+import { Topping } from "@/constants/product.type";
+import { useAddProductToBasket } from "@/hooks/useAddProductToBasket";
+import { useUpdateLikedProduct } from "@/hooks/useUpdateLikedProduct";
 import {
   getAllLikedProducts,
   getProductById,
-  updateLikedProducts,
+  getShoppingCart,
 } from "@/libs/appwrite/appwrite";
+import { AddToBasketPayload } from "@/libs/appwrite/payload.type";
 import { formatToUSD } from "@/utils/formatCurrency";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useUser } from "@clerk/clerk-expo";
+import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../ui/Button";
+import ProductDetailSkeleton from "../ui/loading/ProductDetailSkeleton";
 import CustomCheckbox from "../ui/MyCheckbox";
-import { useUser } from "@clerk/clerk-expo";
-import { useUpdateLikedProduct } from "@/hooks/useUpdateLikedProduct";
+import NotifyPopup from "../ui/popup/NotifyPopup";
+import { NotifyPopupProps } from "@/constants/types";
 
 const ProductDetail = () => {
   const { user } = useUser();
   const { id } = useLocalSearchParams();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => getProductById(id as string),
   });
@@ -36,7 +42,23 @@ const ProductDetail = () => {
       getAllLikedProducts(user?.emailAddresses[0].emailAddress as string),
   });
 
+  const { data: shoppingSession } = useQuery({
+    queryKey: ["shopping.sesison", user?.emailAddresses[0].emailAddress],
+    queryFn: () =>
+      getShoppingCart(user?.emailAddresses[0].emailAddress as string),
+  });
+
+  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+  const [quantity, setQuantity] = useState(1);
+
+  const [notifyPopup, setNotifyPopup] = useState<NotifyPopupProps>({
+    message: "Added to cart",
+    type: "success",
+    show: false,
+  });
+
   const updateLikedProductMutation = useUpdateLikedProduct();
+  const addProductToBasketMutation = useAddProductToBasket();
 
   const onPressLiked = async () => {
     const likedProductIds =
@@ -56,6 +78,56 @@ const ProductDetail = () => {
       likedProducts?.products.findIndex((product) => product.id === id) !== -1
     );
   }, [likedProducts]);
+
+  const onSelectedTopping = (topping: Topping) => {
+    const index = selectedToppings.findIndex((item) => item.id === topping.id);
+    if (index === -1) {
+      setSelectedToppings([...selectedToppings, topping]);
+    } else {
+      setSelectedToppings(
+        selectedToppings.filter((item) => item.id !== topping.id)
+      );
+    }
+  };
+
+  const handleAddProductToBasket = async () => {
+    const payload: AddToBasketPayload = {
+      product_id: id as string,
+      quantity,
+      toppings: selectedToppings.map((topping) => topping.id),
+      toppings_price: selectedToppings.map((topping) => topping.price),
+      price: data?.price_discounted || 0,
+    };
+    try {
+      await addProductToBasketMutation.mutateAsync({
+        email: user?.emailAddresses[0].emailAddress as string,
+        payload,
+        currentShoppingSession: shoppingSession
+          ? shoppingSession[0]
+          : shoppingSession,
+      });
+      setNotifyPopup({ message: "Added to cart", show: true, type: "success" });
+    } catch (e) {
+      setNotifyPopup({
+        message: "Something went wrong",
+        show: true,
+        type: "error",
+      });
+    }
+  };
+
+  const productQuantityInBasket = useMemo(() => {
+    if (shoppingSession && shoppingSession.length > 0) {
+      return (
+        shoppingSession[0].cartItems.find((item) => item.product_id === id)
+          ?.quantity || 0
+      );
+    }
+
+    return 0;
+  }, [shoppingSession]);
+
+  if (isLoading) return <ProductDetailSkeleton />;
 
   return (
     <SafeAreaView className="px-3 mt-12">
@@ -77,12 +149,28 @@ const ProductDetail = () => {
               <ArrowLeftIcon />
             </TouchableOpacity>
 
+            {!!productQuantityInBasket && (
+              <Button
+                className="absolute top-4 right-3"
+                activeOpacity={0.9}
+                onPress={() => router.push("/basket")}
+                size="md"
+                title={`${productQuantityInBasket}`}
+                leftIcon={<ShoppingBagFillIcon />}
+                textStyles="w-[26px] h-[26px] rounded-full text-center bg-white text-primary-500 font-[Roboto-Medium] text-base"
+              />
+            )}
+
             <TouchableOpacity
               activeOpacity={0.9}
               onPress={onPressLiked}
               className="absolute bottom-4 right-3 w-10 h-10 rounded-full bg-white justify-center items-center"
             >
-              {isLikedProduct ? <LikedIconFill /> : <LikedOutlineIcon />}
+              {isLikedProduct ? (
+                <LikedIconFill fill="#ff6347" />
+              ) : (
+                <LikedOutlineIcon />
+              )}
             </TouchableOpacity>
           </View>
 
@@ -131,28 +219,48 @@ const ProductDetail = () => {
               </TouchableOpacity>
             </View>
 
-            <View className="space-y-4">
-              <Text className="text-[18px] leading-[21px] text-neutral-900 font-bold font-[Roboto]">
-                Additional Options
-              </Text>
-              {data?.available_toppings.map((toping) => (
-                <View
-                  key={toping.id}
-                  className="flex-row justify-between items-center"
-                >
-                  <Text className="flex-1 text-base leading-[19px] font-[Roboto] text-neutral-900">
-                    Add {toping.name}
+            {data?.available_toppings &&
+              data?.available_toppings.length > 0 && (
+                <View className="space-y-4">
+                  <Text className="text-[18px] leading-[21px] text-neutral-900 font-bold font-[Roboto]">
+                    Additional Options
                   </Text>
-                  <Text className="mr-3 text-base leading-[19px] font-[Roboto] text-neutral-900">
-                    +{formatToUSD(toping.price)}
-                  </Text>
-                  <CustomCheckbox onValueChange={() => {}} value={false} />
+                  {data?.available_toppings.map((topping) => (
+                    <View
+                      key={topping.id}
+                      className="flex-row justify-between items-center"
+                    >
+                      <Text className="flex-1 text-base leading-[19px] font-[Roboto] text-neutral-900">
+                        Add {topping.name}
+                      </Text>
+                      <Text className="mr-3 text-base leading-[19px] font-[Roboto] text-neutral-900">
+                        +{formatToUSD(topping.price)}
+                      </Text>
+                      <CustomCheckbox
+                        onValueChange={() => onSelectedTopping(topping)}
+                        value={
+                          selectedToppings.find(
+                            (item) => item.id === topping.id
+                          )
+                            ? true
+                            : false
+                        }
+                      />
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
+              )}
           </View>
         </View>
       </ScrollView>
+
+      <NotifyPopup
+        visible={notifyPopup.show}
+        onHide={() =>
+          setNotifyPopup({ message: "", show: false, type: "success" })
+        }
+        message={notifyPopup.message}
+      />
       <View
         style={{
           shadowOffset: {
@@ -168,6 +276,8 @@ const ProductDetail = () => {
       >
         <View className="flex-row space-x-3 items-center">
           <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setQuantity((pre) => (pre === 1 ? 1 : pre - 1))}
             className="w-10 h-10 rounded-full flex justify-center items-center"
             style={{
               borderWidth: 1,
@@ -177,9 +287,11 @@ const ProductDetail = () => {
             <MinusIcon />
           </TouchableOpacity>
           <Text className="text-[22px] leading-[26px] font-[Roboto] text-neutral-900">
-            1
+            {quantity}
           </Text>
           <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setQuantity(quantity + 1)}
             className="w-10 h-10 rounded-full flex justify-center items-center"
             style={{
               borderWidth: 1,
@@ -191,6 +303,7 @@ const ProductDetail = () => {
         </View>
         <Button
           activeOpacity={0.9}
+          onPress={handleAddProductToBasket}
           size="lg"
           title="Add to Basket"
           leftIcon={<ShoppingBagFillIcon />}

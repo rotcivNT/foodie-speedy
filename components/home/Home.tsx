@@ -5,6 +5,7 @@ import Header from "./Header";
 import HomeSpecialOffers from "./HomeSpecialOffers";
 import SearchBar from "./SearchBar";
 import Slider from "./Slider";
+import BottomSheet from "../BottomSheet";
 
 const Home = () => {
   return (

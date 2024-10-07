@@ -7,4 +7,7 @@ export const config = {
   productCollectionId: process.env.EXPO_PUBLIC_PRODUCT_COLLECTION_ID as string,
   toppingCollectionId: process.env.EXPO_PUBLIC_TOPPING_COLLECTION_ID as string,
   likedCollectionId: process.env.EXPO_PUBLIC_LIKED_COLLECTION_ID as string,
+  shoppingCollectionId: process.env
+    .EXPO_PUBLIC_SHOPPING_COLLECTION_ID as string,
+  cartCollectionId: process.env.EXPO_PUBLIC_CART_COLLECTION_ID as string,
 };

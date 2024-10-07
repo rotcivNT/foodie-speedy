@@ -1,24 +1,7 @@
-import ArrowLeftIcon from "@/assets/icons/ArrowLeftIcon";
 import { useMemo } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { categories } from "../home/Categories";
-
-interface ProductListHeaderProps {
-  title: string;
-  leftIcon?: React.ReactNode;
-}
-
-const ProductListHeader = ({ title, leftIcon }: ProductListHeaderProps) => {
-  return (
-    <View>
-      <ArrowLeftIcon />
-      <View>
-        {leftIcon}
-        <Text>{title}</Text>
-      </View>
-    </View>
-  );
-};
+import { ScreenHeader } from "./ScreenHeader";
 
 interface BaseProps {
   isCategory: boolean;
@@ -45,7 +28,7 @@ const ProductListWrapper = (props: IProps) => {
   }, []);
   return (
     <View>
-      <ProductListHeader
+      <ScreenHeader
         title={isCategory ? (category?.name as string) : props.title}
         leftIcon={isCategory ? category?.icon : undefined}
       />
