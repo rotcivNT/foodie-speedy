@@ -173,9 +173,10 @@ export const getShoppingCart = async (user_email: string) => {
   return shoppingSessions;
 };
 
-export const createPayment = async (userEmail: string) => {
+export const createPayment = async (userEmail: string, amount: number) => {
   const payload = {
     userEmail,
+    amount,
   };
   const res = await funtions.createExecution(
     "67027e4a0010ee644d34",
