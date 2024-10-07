@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - dev
 jobs:
   build:
     name: Install and build
